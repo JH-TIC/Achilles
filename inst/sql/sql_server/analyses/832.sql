@@ -6,7 +6,6 @@
 -- count_value: Flag (0 or 1) indicating whether any such records exist
 --
 
-WITH op_outside AS , o_total AS 
 SELECT 
 	832 AS analysis_id,
 	CASE WHEN ot.record_count != 0 THEN 
