@@ -6,27 +6,6 @@
 -- count_value: Flag (0 or 1) indicating whether any such records exist
 --
 
-WITH op_outside AS (
-SELECT 
-	COUNT_BIG(*) AS record_count
-FROM 
-	@cdmDatabaseSchema.drug_era de
-LEFT JOIN 
-	@cdmDatabaseSchema.observation_period op 
-ON 
-	de.person_id = op.person_id
-AND 
-	de.drug_era_start_date >= op.observation_period_start_date
-AND 
-	de.drug_era_start_date <= op.observation_period_end_date
-WHERE
-	op.person_id IS NULL
-), de_total AS (
-SELECT
-	COUNT_BIG(*) record_count
-FROM
-	@cdmDatabaseSchema.drug_era
-)
 SELECT 
 	932 AS analysis_id,
 	CASE WHEN det.record_count != 0 THEN 
@@ -42,7 +21,27 @@ SELECT
 INTO 
 	@scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_932
 FROM 
-	op_outside op
+	(
+SELECT 
+	COUNT_BIG(*) AS record_count
+FROM 
+	@cdmDatabaseSchema.drug_era de
+LEFT JOIN 
+	@cdmDatabaseSchema.observation_period op 
+ON 
+	de.person_id = op.person_id
+AND 
+	de.drug_era_start_date >= op.observation_period_start_date
+AND 
+	de.drug_era_start_date <= op.observation_period_end_date
+WHERE
+	op.person_id IS NULL
+) op
 CROSS JOIN 
-	de_total det
+	(
+SELECT
+	COUNT_BIG(*) record_count
+FROM
+	@cdmDatabaseSchema.drug_era
+) det
 ;

@@ -6,27 +6,6 @@
 -- count_value: Flag (0 or 1) indicating whether any such rceords exist
 --
 
-WITH op_outside AS (
-SELECT 
-	COUNT_BIG(*) AS record_count
-FROM 
-	@cdmDatabaseSchema.death d
-LEFT JOIN 
-	@cdmDatabaseSchema.observation_period op 
-ON 
-	d.person_id = op.person_id
-AND 
-	d.death_date >= op.observation_period_start_date
-AND 
-	d.death_date <= op.observation_period_end_date
-WHERE
-	op.person_id IS NULL
-), death_total AS (
-SELECT
-	COUNT_BIG(*) record_count
-FROM
-	@cdmDatabaseSchema.death
-)
 SELECT 
 	532 AS analysis_id,
 	CASE WHEN dt.record_count != 0 THEN
@@ -42,7 +21,27 @@ SELECT
 INTO 
 	@scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_532
 FROM 
-	op_outside op
+	(
+SELECT 
+	COUNT_BIG(*) AS record_count
+FROM 
+	@cdmDatabaseSchema.death d
+LEFT JOIN 
+	@cdmDatabaseSchema.observation_period op 
+ON 
+	d.person_id = op.person_id
+AND 
+	d.death_date >= op.observation_period_start_date
+AND 
+	d.death_date <= op.observation_period_end_date
+WHERE
+	op.person_id IS NULL
+) op
 CROSS JOIN 
-	death_total dt
+	(
+SELECT
+	COUNT_BIG(*) record_count
+FROM
+	@cdmDatabaseSchema.death
+) dt
 ;
