@@ -6,7 +6,6 @@
 -- count_value: Flag (0 or 1) indicating whether any such records exist
 --
 
-WITH op_outside AS , de_total AS 
 SELECT 
 	2132 AS analysis_id,
 	CASE WHEN det.record_count != 0 THEN
