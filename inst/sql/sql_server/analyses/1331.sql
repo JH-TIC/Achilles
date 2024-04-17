@@ -6,6 +6,27 @@
 -- count_value: Flag (0 or 1) indicating whether any such records exist
 --
 
+WITH op_outside AS (
+SELECT 
+	COUNT_BIG(DISTINCT vd.person_id) AS person_count
+FROM 
+	@cdmDatabaseSchema.visit_detail vd
+LEFT JOIN 
+	@cdmDatabaseSchema.observation_period op 
+ON 
+	vd.person_id = op.person_id
+AND 
+	vd.visit_detail_start_date >= op.observation_period_start_date
+AND 
+	vd.visit_detail_start_date <= op.observation_period_end_date
+WHERE
+	op.person_id IS NULL
+), vd_total AS (
+SELECT
+	COUNT_BIG(DISTINCT person_id) person_count
+FROM
+	@cdmDatabaseSchema.visit_detail
+)
 SELECT 
 	1331 AS analysis_id,
 	CASE WHEN vdt.person_count != 0 THEN 
@@ -21,27 +42,7 @@ SELECT
 INTO 
 	@scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_1331
 FROM 
-	(
-SELECT 
-	COUNT_BIG(DISTINCT vd.person_id) AS person_count
-FROM 
-	@cdmDatabaseSchema.visit_detail vd
-LEFT JOIN 
-	@cdmDatabaseSchema.observation_period op 
-ON 
-	vd.person_id = op.person_id
-AND 
-	vd.visit_detail_start_date >= op.observation_period_start_date
-AND 
-	vd.visit_detail_start_date <= op.observation_period_end_date
-WHERE
-	op.person_id IS NULL
-) op
+	op_outside op
 CROSS JOIN 
-	(
-SELECT
-	COUNT_BIG(DISTINCT person_id) person_count
-FROM
-	@cdmDatabaseSchema.visit_detail
-) vdt
+	vd_total vdt
 ;

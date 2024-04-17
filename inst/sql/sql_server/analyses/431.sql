@@ -6,6 +6,27 @@
 -- count_value: Flag (0 or 1) indicating whether any such records exist
 --
 
+WITH op_outside AS (
+SELECT 
+	COUNT_BIG(DISTINCT co.person_id) AS person_count
+FROM 
+	@cdmDatabaseSchema.condition_occurrence co
+LEFT JOIN 
+	@cdmDatabaseSchema.observation_period op 
+ON 
+	co.person_id = op.person_id
+AND 
+	co.condition_start_date >= op.observation_period_start_date
+AND 
+	co.condition_start_date <= op.observation_period_end_date
+WHERE
+	op.person_id IS NULL
+), co_total AS (
+SELECT
+	COUNT_BIG(DISTINCT person_id) person_count
+FROM
+	@cdmDatabaseSchema.condition_occurrence
+)
 SELECT 
 	431 AS analysis_id,
 	CASE WHEN co.person_count != 0 THEN
@@ -21,27 +42,7 @@ SELECT
 INTO 
 	@scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_431
 FROM 
-	(
-SELECT 
-	COUNT_BIG(DISTINCT co.person_id) AS person_count
-FROM 
-	@cdmDatabaseSchema.condition_occurrence co
-LEFT JOIN 
-	@cdmDatabaseSchema.observation_period op 
-ON 
-	co.person_id = op.person_id
-AND 
-	co.condition_start_date >= op.observation_period_start_date
-AND 
-	co.condition_start_date <= op.observation_period_end_date
-WHERE
-	op.person_id IS NULL
-) op
+	op_outside op
 CROSS JOIN 
-	(
-SELECT
-	COUNT_BIG(DISTINCT person_id) person_count
-FROM
-	@cdmDatabaseSchema.condition_occurrence
-) co
+	co_total co
 ;
