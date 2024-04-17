@@ -8,7 +8,7 @@ select distinct person_id into #msmt from @cdmDatabaseSchema.measurement;
 select distinct person_id into #death from @cdmDatabaseSchema.death;
 select distinct person_id into #prococ from @cdmDatabaseSchema.procedure_occurrence;
 select distinct person_id into #obs from @cdmDatabaseSchema.observation;
-
+/*
 --with rawData as (
 INSERT INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004
 select 2004 as analysis_id,
@@ -1411,7 +1411,7 @@ select 2004 as analysis_id,
 --) 
   
 --select * INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004 from rawData;
-
+*/
 drop table #conoc;
 drop table #drexp;
 drop table #dvexp;
