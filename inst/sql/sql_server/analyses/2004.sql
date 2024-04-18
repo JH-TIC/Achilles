@@ -8,9 +8,8 @@ select distinct person_id into #msmt from @cdmDatabaseSchema.measurement;
 select distinct person_id into #death from @cdmDatabaseSchema.death;
 select distinct person_id into #prococ from @cdmDatabaseSchema.procedure_occurrence;
 select distinct person_id into #obs from @cdmDatabaseSchema.observation;
-/*
---with rawData as (
-INSERT INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004
+
+with rawData as (
 select 2004 as analysis_id,
        CAST('0000001' AS VARCHAR(255)) as stratum_1,
        cast((1.0 * personIntersection.count_value / totalPersonsDb.totalPersons) as varchar(255)) as stratum_2,
@@ -21,6 +20,8 @@ select 2004 as analysis_id,
       from
       (select count(*) as count_value from(select person_id from #obs) subquery) personIntersection,
   (select count(distinct(person_id)) as totalPersons from @cdmDatabaseSchema.person) totalPersonsDb 
+)
+/*
 INSERT INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004
 select 2004 as analysis_id,
        CAST('0000010' AS VARCHAR(255)) as stratum_1,
@@ -1409,9 +1410,9 @@ select 2004 as analysis_id,
       (select count(*) as count_value from(select person_id from #conoc intersect select person_id from #drexp intersect select person_id from #dvexp intersect select person_id from #msmt intersect select person_id from #death intersect select person_id from #prococ intersect select person_id from #obs) subquery) personIntersection,
   (select count(distinct(person_id)) as totalPersons from @cdmDatabaseSchema.person) as totalPersonsDb
 --) 
-  
---select * INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004 from rawData;
-*/
+*/  
+select * INTO @scratchDatabaseSchema@schemaDelim@tempAchillesPrefix_2004 from rawData;
+
 drop table #conoc;
 drop table #drexp;
 drop table #dvexp;
