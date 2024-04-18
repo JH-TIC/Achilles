@@ -670,7 +670,7 @@ select 2004 as analysis_id,
       from
       (select count(*) as count_value from(select person_id from #conoc intersect select person_id from #prococ) as subquery) as personIntersection,
   (select count(distinct(person_id)) as totalPersons from @cdmDatabaseSchema.person) as totalPersonsDb
-);
+),
 rawData2 AS (
 select 2004 as analysis_id,
        CAST('1000011' AS VARCHAR(255)) as stratum_1,
